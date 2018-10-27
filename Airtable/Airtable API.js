@@ -1,3 +1,149 @@
+// Bridging Classes for Drafts
+class BridgeCredential {
+	constructor() {
+		this._bridgeObject = new Object()
+	}
+	
+	static create(identifier, description) {
+		this._bridgeObject = Credential.create(identifier, description);
+		return this
+	}
+	
+	addTextField(key, label) {
+		this._bridgeObject.addTextField(key, label)
+	}
+	
+	addPasswordField(key, label) {
+		this._bridgeObject.addPasswordField(key, label)
+	}
+	
+	authorize() {
+		this._bridgeObject.authorize()
+	}
+	
+	getValue(key) {
+		this._bridgeObject.getValue(key)
+	}
+}
+
+class BridgeHTTPResponse {
+	constructor(response) {
+		this._bridgeObject = response
+	}
+	
+	get success() { return this._bridgeObject.success }
+	get statusCode() { return this._bridgeObject.statusCode }
+	get responseData() { return this._bridgeObject.responseData }
+	get responseText() { return this._bridgeObject.responseText }
+	get otherData() { return this._bridgeObject.otherData }
+	get error() { return this._bridgeObject.error }
+}
+
+class BridgeHTTP {
+	constructor() {
+		this._bridgeObject = new Object()
+	}
+	
+	static create(identifier, description) {
+		this._bridgeObject = Credential.create(identifier, description);
+		return this
+	}
+	
+	request(settings) {
+		let bridgeHTTPResponse = BridgeHTTPResponse(this._bridgeObject.request(settings));
+		return bridgeHTTPResponse
+	}
+}
+
+class BridgeApp {
+	constructor() {
+		this._bridgeObject = app
+	}
+	
+	displayErrorMessage(message) {
+		this._bridgeObject.displayErrorMessage(message)
+	}
+}
+
+var bridgeApp = new BridgeApp()
+
+class BridgePrompt {
+	constructor() {
+		this._bridgeObject = new Object()
+	}
+	
+	static create() {
+		this._bridgeObject = Prompt.create()
+	}
+	
+	set title(value) { this._bridgeObject.title = value }
+	get title() { return this._bridgeObject.title }
+	
+	set message(value) { this._bridgeObject.message = value }
+	get message() { return this._bridgeObject.message }
+	
+	set isCancellable(value) { this._bridgeObject.isCancellable = value }
+	get isCancellable() { return this._bridgeObject.isCancellable }
+	
+	get fieldValues() { return this._bridgeObject.fieldValues }
+	
+	get buttonPressed() { return this._bridgeObject.buttonPressed }
+	
+	addLabel(name, label, options) {
+		this._bridgeObject.addLabel(name, label, options)
+	}
+	
+	addTextField(name, label, initialText, options) {
+		this._bridgeObject.addTextField(name, label, initialText, options)
+	}
+	
+	addTextView(name, label, initialText, options) {
+		this._bridgeObject.addTextView(name, label, initialText, options)
+	}
+	
+	addPasswordField(name, label, initialValue) {
+		this._bridgeObject.addPasswordField(name, label, initialValue)
+	}
+	
+	addSwitch(name, label, initialValue{
+		this._bridgeObject.addSwitch(name, label, initialValue)
+	}
+	
+	addDatePicker(name, label, initialDate, options) {
+		this._bridgeObject.addDatePicker(name, label, initialDate, options)
+	}
+	
+	addPicker(name, label, columns, selectedRows) {
+		this._bridgeObject.addPicker(name, label, columns, selectedRows)
+	}
+	
+	addSelect(name, label, values, selectedValues, allowMultiple) {
+		this._bridgeObject.addSelect(name, label, values, selectedValues, allowMultiple)
+	}
+	
+	addButton(name, value) {
+		this._bridgeObject.addButton(name, value)
+	}
+	
+	show() { this._bridgeObject.show() }
+}
+
+class BridgeContext() {
+	constructor() {
+		this._bridgeObject = context
+	}
+	
+	cancel(message) { this._bridgeObject.cancel(message) }
+}
+
+bridgeContext = new BridgeContext();
+
+function bridgeAlert(message) {
+	alert(message)
+}
+
+
+// Airtable Classes
 class ATURL {
 	constructor(baseURL) {
 		this.baseURL = baseURL;
@@ -86,7 +232,7 @@ class ATHTTPRequest {
 	}
 	
 	get(options = {}) {
-		let http = HTTP.create();
+		let http = BridgeHTTP.create();
 		let url = new ATURL("https://api.airtable.com/v0/" + this.table.base._endpoint + "/" + encodeURIComponent(this.table.name));
 		url.parameters = options;
 		let response = http.request({
@@ -102,14 +248,14 @@ class ATHTTPRequest {
 			this.success = false;
 			this.error = ATHTTPRequest._errorMessage(response);
 			this.table.lastError = this.error;
-			app.displayErrorMessage(this.error);
+			bridgeApp.displayErrorMessage(this.error);
 		}
 		
 		return this.success;
 	}
 	
 	post(record) {
-		let http = HTTP.create();
+		let http = BridgeHTTP.create();
 		let url = new ATURL("https://api.airtable.com/v0/" + this.table.base._endpoint + "/" + encodeURIComponent(this.table.name));
 		let response = http.request({
 			"url": url.constructURL(),
@@ -125,14 +271,14 @@ class ATHTTPRequest {
 			this.success = false;
 			this.error = ATHTTPRequest._errorMessage(response);
 			this.table.lastError = this.error;
-			app.displayErrorMessage(this.error);
+			bridgeApp.displayErrorMessage(this.error);
 		}
 		
 		return this.success;
 	}
 	
 	patch(record) {
-		let http = HTTP.create();
+		let http = BridgeHTTP.create();
 		let url = new ATURL("https://api.airtable.com/v0/" + this.table.base._endpoint + "/" + encodeURIComponent(this.table.name) + "/" + record.id);
 		let response = http.request({
 			"url": url.constructURL(),
@@ -148,7 +294,7 @@ class ATHTTPRequest {
 			this.success = false;
 			this.error = ATHTTPRequest._errorMessage(response);
 			this.table.lastError = this.error;
-			app.displayErrorMessage(this.error);
+			bridgeApp.displayErrorMessage(this.error);
 		}
 		
 		return this.success;
@@ -171,8 +317,8 @@ class ATRecord {
 	}
 	
 	set id(value) {
-		app.displayErrorMessage("The id property of ATRecord is read only");
-		context.cancel();
+		bridgeApp.displayErrorMessage("The id property of ATRecord is read only");
+		bridgeContex.cancel();
 	}
 	
 	get table() {
@@ -180,8 +326,8 @@ class ATRecord {
 	}
 	
 	set table(value) {
-		app.displayErrorMessage("The table property of ATRecord is read only");
-		context.cancel();
+		("The table property of ATRecord is read only");
+		bridgeContex.cancel();
 	}
 	
 	get createdTime() {
@@ -189,8 +335,8 @@ class ATRecord {
 	}
 	
 	set createdTime(value) {
-		app.displayErrorMessage("The createdTime property of ATRecord is read only");
-		context.cancel();
+		("The createdTime property of ATRecord is read only");
+		bridgeContex.cancel();
 	}
 	
 	static create() {
@@ -257,9 +403,9 @@ class ATRecord {
 			}
 			
 		} else if (this._table) {
-			alert("ERROR: table must be updated before record can be updated");
+			bridgeAlert("ERROR: table must be updated before record can be updated");
 		} else {
-			alert("ERROR: record not yet added to table");
+			bridgeAlert("ERROR: record not yet added to table");
 			return false;
 		}
 	}
@@ -288,7 +434,7 @@ class ATRecord {
 			}
 		}
 		
-		let prompt = Prompt.create();
+		let prompt = BridgePrompt.create();
 		prompt.title = title;
 		prompt.message = message;
 		switch (type) {
@@ -307,7 +453,7 @@ class ATRecord {
 				if (selected) {
 					return prompt.fieldValues["selectedRecords"].map(label => labelToRecordMap[label]);
 				} else {
-					context.cancel();
+					bridgeContex.cancel();
 				}
 				break;
 			case "selectButtons":
@@ -318,7 +464,7 @@ class ATRecord {
 				if (selected2) {
 					return [idToRecordMap[prompt.buttonPressed]];
 				} else {
-					context.cancel();
+					bridgeContex.cancel();
 				}
 				break;
 		}
@@ -343,8 +489,8 @@ class ATTable {
 	}
 	
 	set name(value) {
-		app.displayErrorMessage("The name property of ATTable is read only");
-		context.cancel();
+		("The name property of ATTable is read only");
+		bridgeContex.cancel();
 	}
 	
 	get base() {
@@ -352,8 +498,8 @@ class ATTable {
 	}
 	
 	set base(value) {
-		app.displayErrorMessage("The base property of ATTable is read only");
-		context.cancel();
+		bridgeApp.displayErrorMessage("The base property of ATTable is read only");
+		bridgeContex.cancel();
 	}
 	
 	static create(name, base){
@@ -365,8 +511,8 @@ class ATTable {
 	}
 	
 	set records(value) {
-		app.displayErrorMessage("The records property of ATTable is read only");
-		context.cancel();
+		bridgeApp.displayErrorMessage("The records property of ATTable is read only");
+		bridgeContex.cancel();
 	}
 	
 	get fields() {
@@ -378,8 +524,8 @@ class ATTable {
 	}
 	
 	set fields(value) {
-		app.displayErrorMessage("The fields property of ATTable is read only");
-		context.cancel();
+		bridgeApp.displayErrorMessage("The fields property of ATTable is read only");
+		bridgeContex.cancel();
 	}
 	
 	_pullData() {
@@ -455,8 +601,8 @@ class ATBase {
 	}
 	
 	set tables(value) {
-		app.displayErrorMessage("The tables property of ATBase is read only");
-		context.cancel();
+		bridgeApp.displayErrorMessage("The tables property of ATBase is read only");
+		bridgeContex.cancel();
 	}
 	
 	static create(name) {
@@ -464,7 +610,7 @@ class ATBase {
 	}
 	
 	_authorize() {
-		let credential = Credential.create("Airtable (" + this._name + ")", "Enter base info");
+		let credential = BridgeCredential.create("Airtable (" + this._name + ")", "Enter base info");
 		credential.addTextField("endpoint", "Endpoint");
 		credential.addPasswordField("apiKey", "API key");
 		credential.authorize();
